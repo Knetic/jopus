@@ -22,6 +22,7 @@ JNIEXPORT void JNICALL Java_JOpusFile_jopusOpenFile(JNIEnv* environment, jobject
 	jclass callerClass;
 	jclass formatClass;
 	jmethodID formatConstructor;
+	jmethodID endiannessMethod;
 	jfieldID metaPointerID;
 	jfieldID formatID;
 	jobject format;
@@ -29,6 +30,7 @@ JNIEXPORT void JNICALL Java_JOpusFile_jopusOpenFile(JNIEnv* environment, jobject
 	opus_int32 channels;
 	opus_uint32 bitrate;
 	int err;
+	jboolean bigEndian;
 
 	// set up metadata wrapper.
 	err = OPUS_OK;
@@ -61,12 +63,17 @@ JNIEXPORT void JNICALL Java_JOpusFile_jopusOpenFile(JNIEnv* environment, jobject
 	bitrate = op_bitrate(opus->file, -1);
 
 	// create AudioFormat
+	callerClass	= (*environment)->GetObjectClass(environment, caller);
 	formatClass	= (*environment)->FindClass(environment, "javax/sound/sampled/AudioFormat");
+
 	formatConstructor 	= (*environment)->GetMethodID(environment, formatClass, "<init>", "(FIIZZ)V");
-	format 			= (*environment)->NewObject(environment, formatClass, formatConstructor, (jfloat)(sampleRate / channels), 16, channels, JNI_TRUE, JNI_FALSE);
+	endiannessMethod	= (*environment)->GetMethodID(environment, callerClass, "isNativeOrderBigEndian", "()Z");
+
+	bigEndian 		= (*environment)->CallBooleanMethod(environment, caller, endiannessMethod);
+	format 			= (*environment)->NewObject(environment, formatClass, formatConstructor, (jfloat)(sampleRate / channels), 16, channels, JNI_TRUE, bigEndian);
 
 	// set fields in this object
-	callerClass	= (*environment)->GetObjectClass(environment, caller);
+	
 	metaPointerID	= (*environment)->GetFieldID(environment, callerClass, "wrapperPointer", "J");
 	formatID	= (*environment)->GetFieldID(environment, callerClass, "format", "Ljavax/sound/sampled/AudioFormat;");
 
