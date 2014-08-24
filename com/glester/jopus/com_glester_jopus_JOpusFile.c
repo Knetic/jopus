@@ -1,4 +1,4 @@
-#include "JOpusFile.h"
+#include "com_glester_jopus_JOpusFile.h"
 #include <opus/opusfile.h>
 #include <stdlib.h>
 #include <jni.h>
@@ -15,7 +15,7 @@ typedef struct
 void throwException(JNIEnv*, const char*);
 void throwOpusException(JNIEnv*, int);
 
-JNIEXPORT void JNICALL Java_JOpusFile_jopusOpenFile(JNIEnv* environment, jobject caller, jstring filePath)
+JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusFile_jopusOpenFile(JNIEnv* environment, jobject caller, jstring filePath)
 {
 	OpusWrapper* opus;
 	OpusHead* head;
@@ -81,7 +81,7 @@ JNIEXPORT void JNICALL Java_JOpusFile_jopusOpenFile(JNIEnv* environment, jobject
 	(*environment)->SetObjectField(environment, caller, formatID, format);
 }
 
-JNIEXPORT jint JNICALL Java_JOpusFile_jopusRead(JNIEnv* environment, jobject caller, jobject sampleBuffer)
+JNIEXPORT jint JNICALL Java_com_glester_jopus_JOpusFile_jopusRead(JNIEnv* environment, jobject caller, jobject sampleBuffer)
 {
 	OpusWrapper* opus;
 	jclass callerClass;
@@ -104,7 +104,7 @@ JNIEXPORT jint JNICALL Java_JOpusFile_jopusRead(JNIEnv* environment, jobject cal
 	return (jint)samplesRead;
 }
 
-JNIEXPORT void JNICALL Java_JOpusFile_jopusClose(JNIEnv* environment, jobject caller)
+JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusFile_jopusClose(JNIEnv* environment, jobject caller)
 {
 	OpusWrapper* opus;
 	jclass callerClass;

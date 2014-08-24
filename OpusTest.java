@@ -1,4 +1,5 @@
 import javax.sound.sampled.*;
+import com.glester.jopus.*;
 
 public class OpusTest
 {

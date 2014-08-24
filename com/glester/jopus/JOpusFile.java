@@ -1,3 +1,5 @@
+package com.glester.jopus;
+
 import java.nio.*;
 import javax.sound.sampled.*;
 
@@ -6,6 +8,10 @@ public class JOpusFile
 	public ByteBuffer sampleBuffer;
 	public AudioFormat format;
 
+	/**
+		Holds the actual memory location of the OggOpusFile object in memory.
+		Used by native code when reading or closing the file.
+	*/
 	protected long wrapperPointer;
 	private int sampleSizeInBytes;
 
@@ -28,6 +34,10 @@ public class JOpusFile
 		sampleSizeInBytes = format.getSampleSizeInBits() / 8;
 	}	
 
+	/**
+		Reads and decodes a length of samples from the file. Returns the number of decoded PCM bytes that resulted.
+		The actual contents of the read operation will be in this.sampleBuffer
+	*/
 	public int read()
 	{
 		int samplesRead;
@@ -39,11 +49,17 @@ public class JOpusFile
 		return samplesRead * 2 * format.getChannels();
 	}
 
+	/**
+		Closes any file handles and disposes of any resources used by this object.
+	*/
 	public void close()
 	{
 		jopusClose();
 	}
 
+	/**
+		Used by native code when constructing the AudioFormat.
+	*/
 	protected boolean isNativeOrderBigEndian()
 	{
 		return ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN;

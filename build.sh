@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Pulls and builds the Opus source,
+# Pulls and builds the Opus/Opusfile source,
 # then builds jopus.
 
-# before anything else, make sure JAVA_HOME is specified.
+# before anything else, make sure JAVA_HOME is specified. We need this for the JNI shared libraries.
 if [ "$JAVA_HOME" == "" ]
 then
 	echo "Environment variable JAVA_HOME must be specified."
@@ -79,13 +79,13 @@ rm -f *.log
 
 # prepare jni headers and compile wrapper class
 echo "Building java file"
-javac ./JOpusFile.java
-javah -jni JOpusFile
+javac ./com/glester/jopus/JOpusFile.java
+javah -jni -d ./com/glester/jopus com.glester.jopus.JOpusFile
 
 # compile jopus native
 echo "Compiling jni library"
 
-gcc -shared *.c \
+gcc -shared ./com/glester/jopus/*.c \
 	-I./opus/include -I./opusfile/include \
 	-I$JAVA_HOME/include -I$JAVA_HOME/include/linux \
 	-L./opus/.libs -L./opusfile/.libs \
@@ -96,10 +96,4 @@ gcc -shared *.c \
 cp ./opus/.libs/libopus.so .
 cp ./opusfile/.libs/libopusfile.so .
 
-echo "Done, building and executing test program."
-
-LD_LIBRARY_PATH=.
-export LD_LIBRARY_PATH
-
-javac ./OpusTest.java
-java OpusTest -Djava.library.path=.
+echo "Done"
