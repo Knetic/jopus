@@ -6,13 +6,7 @@ public class JOpusFile
 	public ByteBuffer sampleBuffer;
 	public AudioFormat format;
 
-	// raw format information. These are all converted to AudioFormat during construction.
-	// TODO: make these a tiny private class, so that we don't hold more memory than we need to.
 	protected long wrapperPointer;
-	protected int sampleRate;
-	protected int bitrate;
-    	protected int channels;
-
 	private int sampleSizeInBytes;
 
 	//
@@ -22,12 +16,15 @@ public class JOpusFile
 
 	public JOpusFile(String filePath)
 	{
+		int bufferSize;
+
+		// after this is called, both "wrapperPointer" and "format" will be set to values.
 		jopusOpenFile(filePath);
 
 		// one 16-bit sample per channel, with enough room for .2s of sound per buffer.
-		sampleBuffer = ByteBuffer.allocateDirect(16 * channels * (sampleRate / 4)).order(ByteOrder.nativeOrder());
-		format = new AudioFormat((float)sampleRate / channels, 16, channels, true, ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN);
-
+		bufferSize = 16 * format.getChannels() * (int)(format.getSampleRate() / 4);
+		
+		sampleBuffer = ByteBuffer.allocateDirect(bufferSize).order(ByteOrder.nativeOrder());
 		sampleSizeInBytes = format.getSampleSizeInBits() / 8;
 	}	
 
@@ -39,12 +36,17 @@ public class JOpusFile
 		sampleBuffer.position(0);
 
 		// number of samples times 
-		return samplesRead * 2 * channels;
+		return samplesRead * 2 * format.getChannels();
 	}
 
 	public void close()
 	{
 		jopusClose();
+	}
+
+	protected boolean isNativeOrderBigEndian()
+	{
+		return ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN;
 	}
 
 	static

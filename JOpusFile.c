@@ -20,11 +20,11 @@ JNIEXPORT void JNICALL Java_JOpusFile_jopusOpenFile(JNIEnv* environment, jobject
 	OpusWrapper* opus;
 	OpusHead* head;
 	jclass callerClass;
+	jclass formatClass;
+	jmethodID formatConstructor;
 	jfieldID metaPointerID;
-	jfieldID sampleRateID;
-	jfieldID durationID;
-	jfieldID channelsID;
-	jfieldID bitrateID;
+	jfieldID formatID;
+	jobject format;
 	opus_uint32 sampleRate;
 	opus_int32 channels;
 	opus_uint32 bitrate;
@@ -60,17 +60,18 @@ JNIEXPORT void JNICALL Java_JOpusFile_jopusOpenFile(JNIEnv* environment, jobject
 
 	bitrate = op_bitrate(opus->file, -1);
 
-	// set fields in java
+	// create AudioFormat
+	formatClass	= (*environment)->FindClass(environment, "javax/sound/sampled/AudioFormat");
+	formatConstructor 	= (*environment)->GetMethodID(environment, formatClass, "<init>", "(FIIZZ)V");
+	format 			= (*environment)->NewObject(environment, formatClass, formatConstructor, (jfloat)(sampleRate / channels), 16, channels, JNI_TRUE, JNI_FALSE);
+
+	// set fields in this object
 	callerClass	= (*environment)->GetObjectClass(environment, caller);
 	metaPointerID	= (*environment)->GetFieldID(environment, callerClass, "wrapperPointer", "J");
-	sampleRateID	= (*environment)->GetFieldID(environment, callerClass, "sampleRate", "I");
-	channelsID	= (*environment)->GetFieldID(environment, callerClass, "channels", "I");
-	bitrateID	= (*environment)->GetFieldID(environment, callerClass, "bitrate", "I");
+	formatID	= (*environment)->GetFieldID(environment, callerClass, "format", "Ljavax/sound/sampled/AudioFormat;");
 
 	(*environment)->SetLongField(environment, caller, metaPointerID, (jlong)opus);
-	(*environment)->SetIntField(environment, caller, sampleRateID, (jint)sampleRate);
-	(*environment)->SetIntField(environment, caller, channelsID, (jint)channels);
-	(*environment)->SetIntField(environment, caller, bitrateID, (jint)bitrate);
+	(*environment)->SetObjectField(environment, caller, formatID, format);
 }
 
 JNIEXPORT jint JNICALL Java_JOpusFile_jopusRead(JNIEnv* environment, jobject caller, jobject sampleBuffer)
