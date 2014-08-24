@@ -1,5 +1,5 @@
-opus/
-opusfile/
+opus
+opusfile
 
 *.so
 *.class
