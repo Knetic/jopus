@@ -3,6 +3,9 @@
 # Pulls and builds the Opus/Opusfile source,
 # then builds jopus.
 
+# This script ought to be platform independent, but requires the use of 'git', 'gcc', 'java', 'jar', 'make', and 'dh-autoreconf'.
+# No attempt is made by the script to install these tools, you'll have to do it yourself.
+
 # before anything else, make sure JAVA_HOME is specified. We need this for the JNI shared libraries.
 if [ "$JAVA_HOME" == "" ]
 then
@@ -98,6 +101,6 @@ cp ./opusfile/.libs/libopusfile.so .
 
 # make jar
 echo "Zipping"
-zip jopus.jar ./com/glester/jopus/*.class ./META-INF/*
+jar cf jopus.jar ./META-INF/* ./com/glester/jopus/*.class
 
 echo "Done"
