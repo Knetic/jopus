@@ -3,5 +3,6 @@ opusfile/
 
 *.so
 *.class
+*.jar
 *.log
 *.*~

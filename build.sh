@@ -96,4 +96,8 @@ gcc -shared ./com/glester/jopus/*.c \
 cp ./opus/.libs/libopus.so .
 cp ./opusfile/.libs/libopusfile.so .
 
+# make jar
+echo "Zipping"
+zip jopus.jar ./com/glester/jopus/*.class ./META-INF/*
+
 echo "Done"
