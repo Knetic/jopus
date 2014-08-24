@@ -1,4 +1,6 @@
 opus/
+opusfile/
+
 *.so
 *.class
 *.log

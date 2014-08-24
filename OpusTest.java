@@ -48,21 +48,19 @@ public class OpusTest
     public static void play()
     {
 	byte[] backingBuffer;
-	int samplesRead;
+	int bytesRead;
 
-    backingBuffer = new byte[opus.sampleBuffer.capacity()];
+	backingBuffer = new byte[opus.sampleBuffer.capacity()];
 
 	while(true)
 	{
-	    samplesRead = opus.read();
-		System.out.println(samplesRead);
-		if(samplesRead <= 0)
+		bytesRead = opus.read();
+
+		if(bytesRead <= 0)
 		      break;
 
-		System.out.println("Writing frame");
-		opus.sampleBuffer.get(backingBuffer);
-	    
-	    line.write(backingBuffer, 0, samplesRead);
+		opus.sampleBuffer.get(backingBuffer);	    
+		line.write(backingBuffer, 0, bytesRead);
 	}
     }
 }

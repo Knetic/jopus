@@ -4,29 +4,31 @@ import javax.sound.sampled.*;
 public class JOpusFile
 {
 	public ByteBuffer sampleBuffer;
-	public long wrapperPointer;
-
-	// file information
 	public AudioFormat format;
 
-	public int sampleRate;
-	public int bitrate;
-    	public int channels;
+	// raw format information. These are all converted to AudioFormat during construction.
+	// TODO: make these a tiny private class, so that we don't hold more memory than we need to.
+	protected long wrapperPointer;
+	protected int sampleRate;
+	protected int bitrate;
+    	protected int channels;
+
+	private int sampleSizeInBytes;
 
 	//
-	public native void jopusOpenFile(String path);
-	public native int jopusRead(ByteBuffer samplesBuffer);
-	public native void jopusClose();
+	protected native void jopusOpenFile(String path);
+	protected native int jopusRead(ByteBuffer samplesBuffer);
+	protected native void jopusClose();
 
 	public JOpusFile(String filePath)
 	{
 		jopusOpenFile(filePath);
 
-		sampleBuffer = ByteBuffer.allocateDirect(sampleRate * channels).order(ByteOrder.nativeOrder());
-		format = new AudioFormat((float)sampleRate, 16, channels, true, ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN);
+		// one 16-bit sample per channel, with enough room for .2s of sound per buffer.
+		sampleBuffer = ByteBuffer.allocateDirect(16 * channels * (sampleRate / 4)).order(ByteOrder.nativeOrder());
+		format = new AudioFormat((float)sampleRate / channels, 16, channels, true, ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN);
 
-		System.out.println("Sample rate: " + sampleRate);
-		System.out.println("Bitrate: " + bitrate);
+		sampleSizeInBytes = format.getSampleSizeInBits() / 8;
 	}	
 
 	public int read()
@@ -36,7 +38,8 @@ public class JOpusFile
 		samplesRead = jopusRead(sampleBuffer);
 		sampleBuffer.position(0);
 
-		return samplesRead * 16 / channels;
+		// number of samples times 
+		return samplesRead * 2 * channels;
 	}
 
 	public void close()
