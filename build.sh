@@ -28,8 +28,11 @@ function checkError()
 }
 function buildOpus()
 {
-	./autogen.sh
-	checkError
+	if [ -f ./autogen.sh ]
+	then
+		./autogen.sh
+		checkError
+	fi
 
 	./configure
 	checkError
@@ -37,6 +40,18 @@ function buildOpus()
 	make
 	checkError
 }
+
+# pull ogg
+if [ ! -d ./ogg ]
+then
+	wget -c http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz
+	tar xzvf ./libogg-1.3.2.tar.gz -C ogg
+	rm ./libogg-1.3.2.tar.gz
+
+	pushd ./ogg >> /dev/null
+	buildOpus
+	popd >> /dev/null
+fi
 
 # pull opus
 if [ ! -d ./opus ]
@@ -113,7 +128,7 @@ checkError
 echo "Compiling jni library"
 
 gcc -shared ./com/glester/jopus/*.c \
-	-I./opus/include -I./opusfile/include \
+	-I./ogg/include -I./opus/include -I./opusfile/include \
 	-I$JAVA_HOME/include -I$JAVA_HOME/include/linux \
 	-L./opus/.libs -L./opusfile/.libs \
 	-lopus -lopusfile \
@@ -121,6 +136,7 @@ gcc -shared ./com/glester/jopus/*.c \
 	-w -fPIC -m64
 checkError
 
+cp ./ogg/src/.libs/libogg.so .
 cp ./opus/.libs/libopus.so .
 cp ./opusfile/.libs/libopusfile.so .
 

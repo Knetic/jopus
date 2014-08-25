@@ -1,5 +1,5 @@
 #include "com_glester_jopus_JOpusFile.h"
-#include <opus/opusfile.h>
+#include "opusfile.h"
 #include <stdlib.h>
 #include <jni.h>
 
