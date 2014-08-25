@@ -15,17 +15,34 @@ then
 	exit;
 fi
 
+function checkError()
+{
+	EXITCODE=$?
+
+	if [ $EXITCODE -ne 0 ];
+	then
+		echo "Exit code of previous command indicated an error: $EXITCODE"
+		exit $EXITCODE
+	fi
+
+}
 function buildOpus()
 {
 	./autogen.sh
+	checkError
+
 	./configure
+	checkError
+
 	make
+	checkError
 }
 
 # pull opus
 if [ ! -d ./opus ]
 then
 	git clone git://git.opus-codec.org/opus.git
+	checkError
 
 	pushd opus >> /dev/null
 	buildOpus
@@ -40,6 +57,7 @@ else
 
 	if [ $LOCAL != $BASE ]; then
 		git pull origin master
+		checkError
 		buildOpus
 	fi
 
@@ -51,6 +69,8 @@ if [ ! -d ./opusfile ]
 then
 
 	git clone git://git.xiph.org/opusfile.git
+	checkError
+
 	pushd opusfile >> /dev/null
 	buildOpus
 	popd >> /dev/null
@@ -65,6 +85,7 @@ else
 
 	if [ $LOCAL != $BASE ]; then
 		git pull origin master
+		checkError
 		buildOpus
 	fi
 
@@ -83,7 +104,10 @@ rm -f *.log
 # prepare jni headers and compile wrapper class
 echo "Building java file"
 javac ./com/glester/jopus/JOpusFile.java
+checkError
+
 javah -jni -d ./com/glester/jopus com.glester.jopus.JOpusFile
+checkError
 
 # compile jopus native
 echo "Compiling jni library"
@@ -95,6 +119,7 @@ gcc -shared ./com/glester/jopus/*.c \
 	-lopus -lopusfile \
 	-o ./libjopus.so \
 	-w -fPIC -m64
+checkError
 
 cp ./opus/.libs/libopus.so .
 cp ./opusfile/.libs/libopusfile.so .
@@ -102,6 +127,7 @@ cp ./opusfile/.libs/libopusfile.so .
 # make jar
 echo "Zipping"
 jar cf jopus.jar ./META-INF/* ./com/glester/jopus/*.class
+checkError
 
 echo "Generating docs"
 javadoc com.glester.jopus -d ./doc
