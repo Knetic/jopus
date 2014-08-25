@@ -73,7 +73,7 @@ fi
 
 # clean.
 echo "Cleaning files"
-rm -f libjopus.so
+rm -f *.so
 rm -f *.java~
 rm -f *.c~
 rm -f *.h~
@@ -102,5 +102,8 @@ cp ./opusfile/.libs/libopusfile.so .
 # make jar
 echo "Zipping"
 jar cf jopus.jar ./META-INF/* ./com/glester/jopus/*.class
+
+echo "Generating docs"
+javadoc com.glester.jopus -d ./doc
 
 echo "Done"

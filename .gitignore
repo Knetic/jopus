@@ -1,5 +1,6 @@
 opus
 opusfile
+doc
 
 *.so
 *.class
