@@ -4,7 +4,7 @@ opus
 opusfile
 doc
 
-*.so
+*.so*
 *.class
 *.jar
 *.log

@@ -26,6 +26,7 @@ function checkError()
 	fi
 
 }
+
 function buildOpus()
 {
 	if [ -f ./autogen.sh ]
@@ -39,13 +40,18 @@ function buildOpus()
 
 	make
 	checkError
+
+	sudo make install
+	checkError
 }
 
 # pull ogg
 if [ ! -d ./ogg ]
 then
 	wget -c http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz
-	tar xzvf ./libogg-1.3.2.tar.gz -C ogg
+
+	tar xzvf ./libogg-1.3.2.tar.gz
+	mv ./libogg-1.3.2 ./ogg
 	rm ./libogg-1.3.2.tar.gz
 
 	pushd ./ogg >> /dev/null
@@ -136,9 +142,9 @@ gcc -shared ./com/glester/jopus/*.c \
 	-w -fPIC -m64
 checkError
 
-cp ./ogg/src/.libs/libogg.so .
-cp ./opus/.libs/libopus.so .
-cp ./opusfile/.libs/libopusfile.so .
+cp ./ogg/src/.libs/libogg.so ./libogg.so.0
+cp ./opus/.libs/libopus.so ./libopus.so.0
+cp ./opusfile/.libs/libopusfile.so ./libopusfile.so.0
 
 # make jar
 echo "Zipping"
