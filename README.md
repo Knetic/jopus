@@ -1,6 +1,8 @@
 JOpus
 ==
 
+[![Build Status](https://travis-ci.org/Knetic/jopus.svg?branch=master)](https://travis-ci.org/Knetic/jopus)
+
 Provides a Java wrapper for decoding Opus audio. 
 
 What is Opus?
