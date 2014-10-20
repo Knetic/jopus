@@ -3,35 +3,17 @@ package com.glester.jopus;
 import java.nio.*;
 import javax.sound.sampled.*;
 
-public class JOpusFile
+public class JOpusFile extends JOpusDecodable
 {
-	public ByteBuffer sampleBuffer;
-	public AudioFormat format;
-
-	/**
-		Holds the actual memory location of the OggOpusFile object in memory.
-		Used by native code when reading or closing the file.
-	*/
-	protected long wrapperPointer;
-	private int sampleSizeInBytes;
-
-	//
 	protected native void jopusOpenFile(String path);
 	protected native int jopusRead(ByteBuffer samplesBuffer);
 	protected native void jopusClose();
 
 	public JOpusFile(String filePath)
 	{
-		int bufferSize;
-
 		// after this is called, both "wrapperPointer" and "format" will be set to values.
 		jopusOpenFile(filePath);
-
-		// one 16-bit sample per channel, with enough room for .2s of sound per buffer.
-		bufferSize = 16 * format.getChannels() * (int)(format.getSampleRate() / 4);
-		
-		sampleBuffer = ByteBuffer.allocateDirect(bufferSize).order(ByteOrder.nativeOrder());
-		sampleSizeInBytes = format.getSampleSizeInBits() / 8;
+		setAudioFormatDetails();
 	}	
 
 	/**
@@ -55,14 +37,6 @@ public class JOpusFile
 	public void close()
 	{
 		jopusClose();
-	}
-
-	/**
-		Used by native code when constructing the AudioFormat.
-	*/
-	protected boolean isNativeOrderBigEndian()
-	{
-		return ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN;
 	}
 
 	static
