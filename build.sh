@@ -127,7 +127,13 @@ echo "Building java file"
 javac ./com/glester/jopus/JOpusFile.java
 checkError
 
+javac ./com/glester/jopus/JOpusBufferFile.java
+checkError
+
 javah -jni -d ./com/glester/jopus com.glester.jopus.JOpusFile
+checkError
+
+javah -jni -d ./com/glester/jopus com.glester.jopus.JOpusBufferFile
 checkError
 
 # compile jopus native

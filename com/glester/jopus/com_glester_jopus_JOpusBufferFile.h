@@ -17,7 +17,7 @@ JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusBufferFile_jopusOpenMemory
 
 /*
  * Class:     com_glester_jopus_JOpusBufferFile
- * Method:    jopusReadMemoru
+ * Method:    jopusReadMemory
  * Signature: (Ljava/nio/ByteBuffer;)I
  */
 JNIEXPORT jint JNICALL Java_com_glester_jopus_JOpusBufferFile_jopusReadMemory

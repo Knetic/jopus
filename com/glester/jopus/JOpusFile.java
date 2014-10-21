@@ -3,6 +3,9 @@ package com.glester.jopus;
 import java.nio.*;
 import javax.sound.sampled.*;
 
+/**
+	Represents an Opus-encoded file that can be progressively streamed from disk.
+*/
 public class JOpusFile extends JOpusDecodable
 {
 	protected native void jopusOpenFile(String path);

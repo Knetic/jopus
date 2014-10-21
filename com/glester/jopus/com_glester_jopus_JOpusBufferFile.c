@@ -1,8 +1,6 @@
 #include "com_glester_jopus_JOpusBufferFile.h"
 #include "opusfile.h"
 #include "jopus.h"
-#include <stdlib.h>
-#include <jni.h>
 
 JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusBufferFile_jopusOpenMemory(JNIEnv* environment, jobject caller, jobject encodedBuffer)
 {

@@ -5,18 +5,25 @@ public class OpusTest
 {
     private static Mixer mixer;
     private static SourceDataLine line;
-    private static JOpusFile opus;
+    private static JOpusDecodable opus;
 
     public static void main(String[] args)
     {
-	opus = new JOpusFile("jazz.opus");
+	try
+	{
+		opus = JOpusBufferFile.loadFromFile("jazz.opus");
 
-	selectLine();
+		selectLine();
 
-	if(line != null)
-		play();
+		if(line != null)
+			play();
 
-	opus.close();
+		opus.close();
+	}
+	catch(Exception e)
+	{
+		e.printStackTrace();
+	}
     }
     
     public static void selectLine()
