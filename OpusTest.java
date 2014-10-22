@@ -1,4 +1,5 @@
 import javax.sound.sampled.*;
+import java.nio.*;
 import com.glester.jopus.*;
 
 public class OpusTest
@@ -39,7 +40,7 @@ public class OpusTest
 	  {
 	      System.out.println("Found a line");
 	      line = (SourceDataLine)AudioSystem.getLine(info);
-	      line.open(opus.format, opus.sampleBuffer.capacity());
+	      line.open(opus.format, opus.getSampleBuffer().capacity());
 	      line.start();
 	  }
 	  else
@@ -55,10 +56,12 @@ public class OpusTest
 
     public static void play()
     {
+	ByteBuffer sampleBuffer;
 	byte[] backingBuffer;
 	int bytesRead;
 
-	backingBuffer = new byte[opus.sampleBuffer.capacity()];
+	sampleBuffer = opus.getSampleBuffer();
+	backingBuffer = new byte[sampleBuffer.capacity()];
 
 	while(true)
 	{
@@ -67,7 +70,7 @@ public class OpusTest
 		if(bytesRead <= 0)
 		      break;
 
-		opus.sampleBuffer.get(backingBuffer);	    
+		sampleBuffer.get(backingBuffer);	    
 		line.write(backingBuffer, 0, bytesRead);
 	}
     }

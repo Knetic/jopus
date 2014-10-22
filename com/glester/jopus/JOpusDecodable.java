@@ -5,8 +5,8 @@ import javax.sound.sampled.*;
 
 public abstract class JOpusDecodable
 {
-	public ByteBuffer sampleBuffer;
 	public AudioFormat format;
+	protected ByteBuffer sampleBuffer;	
 
 	/**
 		Holds the actual memory location of the OggOpusFile object in memory.
@@ -21,14 +21,39 @@ public abstract class JOpusDecodable
 	protected native int jopusRead(ByteBuffer samplesBuffer);
 	protected native void jopusClose();
 
-	protected void setAudioFormatDetails()
+	public void setSampleBuffer(ByteBuffer buffer)
 	{
-		int bufferSize;
-
-		// one 16-bit sample per channel, with enough room for .2s of sound per buffer.
-		bufferSize = 16 * format.getChannels() * (int)(format.getSampleRate() / 4);
+		if(buffer == null)
+			throw new IllegalArgumentException("Given buffer cannot be null");
+		if(!buffer.isDirect())			
+			throw new IllegalArgumentException("Given buffer must be direct");
 		
-		sampleBuffer = ByteBuffer.allocateDirect(bufferSize).order(ByteOrder.nativeOrder());
+		sampleBuffer = buffer;
+	}
+
+	/**
+		Returns the size of buffer required to buffer one second of decoded output.
+		A sample buffer may be smaller than this size (the default sample buffer holds .25s of decoded output)
+		But any sample buffer given to this object should sized to be a scaled version of whatever 
+		number this method returns.
+	*/
+	public int getRequiredBufferSize()
+	{
+		return 16 * format.getChannels() * (int)(format.getSampleRate());
+	}
+
+	public ByteBuffer getSampleBuffer()
+	{
+		return sampleBuffer;
+	}
+
+	protected void createSampleBuffer()
+	{
+		sampleBuffer = ByteBuffer.allocateDirect(getRequiredBufferSize() / 4).order(ByteOrder.nativeOrder());
+	}
+
+	protected void determineSampleSize()
+	{		
 		sampleSizeInBytes = format.getSampleSizeInBits() / 8;
 	}
 

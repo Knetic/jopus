@@ -15,11 +15,26 @@ public class JOpusBufferFile extends JOpusDecodable
 
 	protected native void jopusOpenMemory(ByteBuffer encodedBuffer);
 
+	/**
+		Opens an Opus file which is fully loaded into [encodedBuffer], and prepares to decode it.
+		This method will automatically allocate a sample buffer of the appropriate size;
+		if you'd prefer to give this object a buffer to use (instead of having it allocate one)
+		then use JOpusFile(String, boolean) to opt out of the sample buffer, and then call
+		.setSampleBuffer(ByteBuffer), passing a ByteBuffer which is sized to be .getRequiredBufferSize()
+		, or some scale thereof.
+	*/
 	public JOpusBufferFile(ByteBuffer encodedBuffer)
+	{
+		this(encodedBuffer, true);
+	}
+
+	public JOpusBufferFile(ByteBuffer encodedBuffer, boolean createSampleBuffer)
 	{
 		this.encodedBuffer = encodedBuffer;
 		jopusOpenMemory(encodedBuffer);
-		setAudioFormatDetails();
+
+		if(createSampleBuffer)
+			createSampleBuffer();
 	}
 
 	public static ByteBuffer loadBufferFromJar(String path) throws URISyntaxException, IOException, FileNotFoundException
