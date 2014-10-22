@@ -14,8 +14,6 @@ public class JOpusBufferFile extends JOpusDecodable
 	private ByteBuffer encodedBuffer;
 
 	protected native void jopusOpenMemory(ByteBuffer encodedBuffer);
-	protected native int jopusReadMemory(ByteBuffer samplesBuffer);
-	protected native void jopusCloseMemory();
 
 	public JOpusBufferFile(ByteBuffer encodedBuffer)
 	{
@@ -77,7 +75,7 @@ public class JOpusBufferFile extends JOpusDecodable
 	{
 		int samplesRead;
 
-		samplesRead = jopusReadMemory(sampleBuffer);
+		samplesRead = jopusRead(sampleBuffer);
 		sampleBuffer.position(0);
 
 		// number of samples times 
@@ -86,7 +84,7 @@ public class JOpusBufferFile extends JOpusDecodable
 
 	public void close()
 	{
-		jopusCloseMemory();
+		jopusClose();
 	}	
 
 	static

@@ -15,22 +15,6 @@ extern "C" {
 JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusFile_jopusOpenFile
   (JNIEnv *, jobject, jstring);
 
-/*
- * Class:     com_glester_jopus_JOpusFile
- * Method:    jopusRead
- * Signature: (Ljava/nio/ByteBuffer;)I
- */
-JNIEXPORT jint JNICALL Java_com_glester_jopus_JOpusFile_jopusRead
-  (JNIEnv *, jobject, jobject);
-
-/*
- * Class:     com_glester_jopus_JOpusFile
- * Method:    jopusClose
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusFile_jopusClose
-  (JNIEnv *, jobject);
-
 #ifdef __cplusplus
 }
 #endif

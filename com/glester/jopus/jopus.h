@@ -11,10 +11,5 @@ typedef struct
 	OggOpusFile* file;
 } OpusWrapper;
 
-typedef struct
-{
-	OpusFileCallbacks* callbacks;
-} OpusMemoryWrapper;
-
 void throwException(JNIEnv*, const char*);
-void throwOpusException(JNIEnv*, int);
+void throwOpusException(JNIEnv*, int, const char*);

@@ -15,30 +15,40 @@ void throwException(JNIEnv* environment, const char* errorMessage)
 	Throws an Opus exception, assuming that [error] is an Opus error code.
 	https://mf4.xiph.org/jenkins/view/opus/job/opus/ws/doc/html/group__opus__errorcodes.html
 */
-void throwOpusException(JNIEnv* environment, int error)
+void throwOpusException(JNIEnv* environment, int error, const char* message)
 {
 	const char* errorMessage;
+	char resultMessage[256];
 
 	switch(error)
 	{
-		case OPUS_ALLOC_FAIL		:	errorMessage = "Unable to create Opus decoder: Allocation failure";
+		case OPUS_ALLOC_FAIL		:	errorMessage = "Allocation failure";
 				break;
-		case OPUS_INVALID_STATE		:	errorMessage = "Unable to create Opus decoder: Invalid decoder state";
+		case OPUS_INVALID_STATE		:	errorMessage = "Invalid decoder state";
 				break;
-		case OPUS_UNIMPLEMENTED		:	errorMessage = "Unable to create Opus decoder: Unimplemented request";
+		case OPUS_UNIMPLEMENTED		:	errorMessage = "Unimplemented request";
 				break;
-		case OPUS_INVALID_PACKET	:	errorMessage = "Unable to create Opus decoder: Invalid packet";
+		case OPUS_INVALID_PACKET	:	errorMessage = "Invalid packet";
 				break;
-		case OPUS_INTERNAL_ERROR	:	errorMessage = "Unable to create Opus decoder: Generic internal error";
+		case OPUS_INTERNAL_ERROR	:	errorMessage = "Generic internal error";
 				break;
-		case OPUS_BUFFER_TOO_SMALL	:	errorMessage = "Unable to create Opus decoder: Buffer too small";
+		case OPUS_BUFFER_TOO_SMALL	:	errorMessage = "Buffer too small";
 				break;
-		case OPUS_BAD_ARG		:	errorMessage = "Unable to create Opus decoder: Bad argument";
+		case OPUS_BAD_ARG		:	errorMessage = "Bad argument";
 				break;
-		default				:	errorMessage = "Unable to create Opus decoder: unspecified error";
+		case OP_ENOTFORMAT		:	errorMessage = "Not an Opus stream";
+				break;
+		case OP_EBADHEADER		:	errorMessage = "Bad header";
+				break;
+		case OP_EVERSION		:	errorMessage = "Version mismatch";
+				break;
+		default				:	errorMessage = "unspecified error";
 	}
 
-	throwException(environment, errorMessage);
+	strcat(resultMessage, message);
+	strcat(resultMessage, errorMessage);
+
+	throwException(environment, resultMessage);
 }
 
 /*

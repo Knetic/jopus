@@ -17,7 +17,6 @@ JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusFile_jopusOpenFile(JNIEnv* en
 	jobject format;
 	opus_uint32 sampleRate;
 	opus_int32 channels;
-	opus_uint32 bitrate;
 	int err;
 	jboolean bigEndian;
 
@@ -29,27 +28,14 @@ JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusFile_jopusOpenFile(JNIEnv* en
 
 	if(err != OPUS_OK)
 	{
-		throwOpusException(environment, err);
+		throwOpusException(environment, err, "Unable to open Opus decoder: ");
 		return;
 	}
 
 	head = op_head(opus->file, NULL);
 
 	sampleRate = head->input_sample_rate;
-	if(err != OPUS_OK)
-	{
-		throwOpusException(environment, err);
-		return;
-	}
-
 	channels = head->channel_count;
-	if(err != OPUS_OK)
-	{
-		throwOpusException(environment, err);
-		return;
-	}
-
-	bitrate = op_bitrate(opus->file, -1);
 
 	// create AudioFormat
 	callerClass	= (*environment)->GetObjectClass(environment, caller);
@@ -68,42 +54,4 @@ JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusFile_jopusOpenFile(JNIEnv* en
 
 	(*environment)->SetLongField(environment, caller, metaPointerID, (jlong)opus);
 	(*environment)->SetObjectField(environment, caller, formatID, format);
-}
-
-JNIEXPORT jint JNICALL Java_com_glester_jopus_JOpusFile_jopusRead(JNIEnv* environment, jobject caller, jobject sampleBuffer)
-{
-	OpusWrapper* opus;
-	jclass callerClass;
-	jfieldID metaPointerID;
-	char* sampleBufferContents;
-	opus_int32 samplesRead;
-	int sampleBufferCapacity;
-
-	// get wrapper data.
-	callerClass	= (*environment)->GetObjectClass(environment, caller);
-	metaPointerID	= (*environment)->GetFieldID(environment, callerClass, "wrapperPointer", "J");    
-	opus 		= (OpusWrapper*)((*environment)->GetLongField(environment, caller, metaPointerID));
-	
-	sampleBufferContents = (char*)((*environment)->GetDirectBufferAddress(environment, sampleBuffer));
-	sampleBufferCapacity = (*environment)->GetDirectBufferCapacity(environment, sampleBuffer);
-
-	// read.
-	samplesRead = op_read(opus->file, sampleBufferContents, sampleBufferCapacity, NULL);
-	
-	return (jint)samplesRead;
-}
-
-JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusFile_jopusClose(JNIEnv* environment, jobject caller)
-{
-	OpusWrapper* opus;
-	jclass callerClass;
-	jfieldID metaPointerID;
-
-	// get wrapper data.
-	callerClass	= (*environment)->GetObjectClass(environment, caller);
-	metaPointerID	= (*environment)->GetFieldID(environment, callerClass, "wrapperPointer", "J");    
-	opus 		= (OpusWrapper*)((*environment)->GetLongField(environment, caller, metaPointerID));
-
-	op_free(opus->file);
-	free(opus);
 }

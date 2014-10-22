@@ -18,6 +18,9 @@ public abstract class JOpusDecodable
 	public abstract int read();
 	public abstract void close();
 
+	protected native int jopusRead(ByteBuffer samplesBuffer);
+	protected native void jopusClose();
+
 	protected void setAudioFormatDetails()
 	{
 		int bufferSize;
@@ -35,5 +38,10 @@ public abstract class JOpusDecodable
 	protected boolean isNativeOrderBigEndian()
 	{
 		return ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN;
+	}
+
+	static
+	{
+		System.loadLibrary("jopus");
 	}
 }

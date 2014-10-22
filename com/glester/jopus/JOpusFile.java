@@ -9,8 +9,6 @@ import javax.sound.sampled.*;
 public class JOpusFile extends JOpusDecodable
 {
 	protected native void jopusOpenFile(String path);
-	protected native int jopusRead(ByteBuffer samplesBuffer);
-	protected native void jopusClose();
 
 	public JOpusFile(String filePath)
 	{

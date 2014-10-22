@@ -4,7 +4,7 @@
 
 JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusBufferFile_jopusOpenMemory(JNIEnv* environment, jobject caller, jobject encodedBuffer)
 {
-	OpusMemoryWrapper* opus;
+	OpusWrapper* opus;
 	OpusHead* head;
 	jclass callerClass;
 	jclass formatClass;
@@ -13,10 +13,9 @@ JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusBufferFile_jopusOpenMemory(JN
 	jfieldID metaPointerID;
 	jfieldID formatID;
 	jobject format;
-	jlong* encodedBufferContents;
+	void* encodedBufferContents;
 	opus_uint32 sampleRate;
 	opus_int32 channels;
-	opus_uint32 bitrate;
 	jlong encodedBufferCapacity;
 	int err;
 	jboolean bigEndian;
@@ -24,36 +23,23 @@ JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusBufferFile_jopusOpenMemory(JN
 	// set up metadata wrapper.
 	err = OPUS_OK;
 
-	opus = malloc(sizeof(OpusMemoryWrapper));
-	
-	encodedBufferCapacity = (*environment)->GetDirectBufferCapacity(environment, encodedBuffer);
-	encodedBufferContents = (*environment)->GetByteArrayElements(environment, NULL);
+	opus = malloc(sizeof(OpusWrapper));
 
-	op_mem_stream_create(opus->callbacks, encodedBufferContents, encodedBufferCapacity); 
+	encodedBufferCapacity = (*environment)->GetDirectBufferCapacity(environment, encodedBuffer);
+	encodedBufferContents = (*environment)->GetDirectBufferAddress(environment, encodedBuffer);
+
+	opus->file = op_open_memory(encodedBufferContents, encodedBufferCapacity, &err); 
 
 	if(err != OPUS_OK)
 	{
-		throwOpusException(environment, err);
+		throwOpusException(environment, err, "Unable to load Opus from buffer");
 		return;
 	}
 
 	head = op_head(opus->file, NULL);
 
 	sampleRate = head->input_sample_rate;
-	if(err != OPUS_OK)
-	{
-		throwOpusException(environment, err);
-		return;
-	}
-
 	channels = head->channel_count;
-	if(err != OPUS_OK)
-	{
-		throwOpusException(environment, err);
-		return;
-	}
-
-	bitrate = op_bitrate(opus->file, -1);
 
 	// create AudioFormat
 	callerClass	= (*environment)->GetObjectClass(environment, caller);
@@ -72,14 +58,4 @@ JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusBufferFile_jopusOpenMemory(JN
 
 	(*environment)->SetLongField(environment, caller, metaPointerID, (jlong)opus);
 	(*environment)->SetObjectField(environment, caller, formatID, format);
-}
-
-JNIEXPORT jint JNICALL Java_com_glester_jopus_JOpusBufferFile_jopusReadMemory(JNIEnv* environment, jobject caller, jobject sampleBuffer)
-{
-	return 0;
-}
-
-JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusBufferFile_jopusCloseMemory(JNIEnv* environment, jobject caller)
-{
-	
 }
