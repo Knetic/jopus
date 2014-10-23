@@ -3,7 +3,8 @@ package com.glester.jopus;
 import java.nio.*;
 import javax.sound.sampled.*;
 import java.io.*;
-import java.util.jar.JarFile;
+import java.util.jar.*;
+import java.util.zip.*;
 import java.net.URISyntaxException;
 
 /**
@@ -37,17 +38,22 @@ public class JOpusBufferFile extends JOpusDecodable
 			createSampleBuffer();
 	}
 
-	public static ByteBuffer loadBufferFromJar(String path) throws URISyntaxException, IOException, FileNotFoundException
+	public static ByteBuffer loadBufferFromJar(Class jarClass, String path) throws URISyntaxException, IOException, FileNotFoundException
 	{
 		JarFile currentJar;
+		JarEntry desiredEntry;
 		File currentJarFile;
 		int size;
 		
-		currentJarFile = new File(JOpusBufferFile.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+		currentJarFile = new File(jarClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
 		currentJar = new JarFile(currentJarFile);
-		size = (int)currentJar.getEntry(path).getSize();
+		desiredEntry = currentJar.getJarEntry(path.substring(1, path.length()));
 
-		return loadBufferFromStream(JOpusBufferFile.class.getResourceAsStream(path), size);
+		if(desiredEntry == null)
+			throw new FileNotFoundException();
+	
+		size = (int)desiredEntry.getSize();
+		return loadBufferFromStream(jarClass.getResourceAsStream(path), size);
 	}
 
 	public static ByteBuffer loadBufferFromFile(String path) throws URISyntaxException, IOException, FileNotFoundException
@@ -61,7 +67,7 @@ public class JOpusBufferFile extends JOpusDecodable
 		return loadBufferFromStream(fileStream, (int)encodedFile.length());
 	}
 
-	protected static ByteBuffer loadBufferFromStream(InputStream stream, int size) throws IOException
+	public static ByteBuffer loadBufferFromStream(InputStream stream, int size) throws IOException
 	{
 		ByteBuffer encodedBuffer;
 		byte[] copyBuffer;
@@ -76,9 +82,9 @@ public class JOpusBufferFile extends JOpusDecodable
 		return encodedBuffer;	
 	}
 
-	public static JOpusBufferFile loadFromJar(String path) throws URISyntaxException, IOException, FileNotFoundException
+	public static JOpusBufferFile loadFromJar(Class jarClass, String path) throws URISyntaxException, IOException, FileNotFoundException
 	{
-		return new JOpusBufferFile(loadBufferFromJar(path));
+		return new JOpusBufferFile(loadBufferFromJar(jarClass, path));
 	}
 
 	public static JOpusBufferFile loadFromFile(String path) throws URISyntaxException, IOException, FileNotFoundException
