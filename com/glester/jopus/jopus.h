@@ -11,7 +11,8 @@ typedef struct
 	OggOpusFile* file;
 } OpusWrapper;
 
-void loadOpusComments(JNIEnv*, OggOpusFile*, jobject);
+void loadOpusMeta(JNIEnv*, OpusWrapper*, jobject);
+
 jstring getNullTerminatedString(JNIEnv*, char*);
 jstring* getStringPair(JNIEnv*, char*, int);
 

@@ -15,6 +15,10 @@ public abstract class JOpusDecodable
 	*/
 	protected long wrapperPointer;
 	protected int sampleSizeInBytes;
+	protected long uncompressedLength;
+	protected int bitrate;
+	protected int opusVersion;
+	protected int streamCount;
 
 	private List<OpusTag> tags;
 	private List<String> comments;
