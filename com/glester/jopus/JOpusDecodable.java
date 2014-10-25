@@ -1,8 +1,7 @@
 package com.glester.jopus;
 
 import java.nio.*;
-import java.util.Arrays;
-
+import java.util.*;
 import javax.sound.sampled.*;
 
 public abstract class JOpusDecodable
@@ -17,7 +16,8 @@ public abstract class JOpusDecodable
 	protected long wrapperPointer;
 	protected int sampleSizeInBytes;
 
-	private String[] comments;
+	private List<OpusTag> tags;
+	private List<String> comments;
 	private String vendor;
 	
 	public abstract int read();
@@ -25,7 +25,13 @@ public abstract class JOpusDecodable
 
 	protected native int jopusRead(ByteBuffer samplesBuffer);
 	protected native void jopusClose();
-	
+
+	protected JOpusDecodable()
+	{
+		tags = new LinkedList<OpusTag>();
+		comments = new LinkedList<String>();
+	}
+
 	public void setSampleBuffer(ByteBuffer buffer)
 	{
 		if(buffer == null)
@@ -54,7 +60,25 @@ public abstract class JOpusDecodable
 	
 	public Iterable<String> getComments()
 	{
-		return Arrays.asList(comments);
+		return comments;
+	}
+
+	public Iterable<String> getTag(String key)
+	{
+		List<String> ret;
+
+		ret = new LinkedList<String>();
+
+		for(OpusTag tag : tags)
+			if(tag.getKey().equals(key))
+				ret.add(tag.getValue());
+
+		return ret;
+	}
+
+	public Iterable<OpusTag> getTags()
+	{
+		return tags;
 	}
 	
 	public String getVendor()

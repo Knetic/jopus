@@ -31,8 +31,12 @@ public class OpusTest
 	public static void printComments()
 	{
 		System.out.println("Vendor: '"+opus.getVendor()+"'");
+
 		for(String comment : opus.getComments())
 			System.out.println(comment);
+
+		for(OpusTag tag : opus.getTags())
+			System.out.println(tag.getKey() + " = " + tag.getValue());
 	}
 	
 	public static void selectLine()

@@ -7,46 +7,62 @@ void loadOpusComments(JNIEnv* environment, OggOpusFile* file, jobject caller)
 {
 	jclass callerClass;
 	jclass stringClass;
-	jfieldID commentsArrayID;
+	jclass opusTagClass;
+	jclass listClass;
+	jmethodID listAddID;
+	jmethodID tagCtorID;
+	jfieldID commentsID;
+	jfieldID tagsID;
 	jfieldID vendorID;
 	OpusTags* tags;
-	jobjectArray commentsArray;
+	jobject tagsList;
+	jobject commentsList;
+	jobject tag;
+	jstring* comment;
 	jstring vendorString;
-	jstring commentString;
 
-	stringClass		= (*environment)->FindClass(environment, "java/lang/String");
 	callerClass 		= (*environment)->GetObjectClass(environment, caller);
-	commentsArrayID 	= (*environment)->GetFieldID(environment, callerClass, "comments", "[Ljava/lang/String;");
+	stringClass		= (*environment)->FindClass(environment, "java/lang/String");
+	listClass		= (*environment)->FindClass(environment, "java/util/List");
+	opusTagClass		= (*environment)->FindClass(environment, "com/glester/jopus/OpusTag");
+	commentsID	 	= (*environment)->GetFieldID(environment, callerClass, "comments", "Ljava/util/List;");
+	tagsID	 		= (*environment)->GetFieldID(environment, callerClass, "tags", "Ljava/util/List;");
 	vendorID 		= (*environment)->GetFieldID(environment, callerClass, "vendor", "Ljava/lang/String;");
+	listAddID		= (*environment)->GetMethodID(environment, listClass, "add", "(Ljava/lang/Object;)Z");	
+	tagCtorID		= (*environment)->GetMethodID(environment, opusTagClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");	
+
+	commentsList 		= (*environment)->GetObjectField(environment, caller, commentsID);
+	tagsList 		= (*environment)->GetObjectField(environment, caller, tagsID);
 
 	tags = op_tags(file, -1);
-	commentsArray = (*environment)->NewObjectArray(environment, tags->comments, stringClass, (*environment)->NewStringUTF(environment, ""));
 
 	for(int i = 0; i < tags->comments; i++)
 	{
-		commentString = getJString(environment, tags->user_comments[i], tags->comment_lengths[i]);
-		(*environment)->SetObjectArrayElement(environment, commentsArray, i, commentString);
+		comment = getStringPair(environment, tags->user_comments[i], tags->comment_lengths[i]);
+
+		if(comment[1] == NULL)
+			(*environment)->CallBooleanMethod(environment, commentsList, listAddID, comment[0]);
+		else
+		{
+			tag = (*environment)->NewObject(environment, opusTagClass, tagCtorID, comment[0], comment[1]);
+			(*environment)->CallBooleanMethod(environment, tagsList, listAddID, tag);
+		}
 	}
 
-	vendorString = getJString(environment, tags->vendor, -1);
-
-	(*environment)->SetObjectField(environment, caller, commentsArrayID, commentsArray);
+	vendorString = getNullTerminatedString(environment, tags->vendor);
 	(*environment)->SetObjectField(environment, caller, vendorID, vendorString);
 }
 
-jstring getJString(JNIEnv* environment, char* characters, int len)
+jstring getNullTerminatedString(JNIEnv* environment, char* characters)
 {
 	jchar* utfChars;
+	int len;
 
-	// if length is -1, assume string is null-terminated.
-	if(len == -1)
-	{
-		do
-		{
-			len++;
-		}
-		while(characters[len] != 0);
-	}
+	len = -1;
+
+	do
+		len++;
+	while(characters[len] != 0);
 
 	utfChars = (jchar*)calloc(sizeof(jchar), len);
 
@@ -54,6 +70,48 @@ jstring getJString(JNIEnv* environment, char* characters, int len)
 		utfChars[i] = (jchar)characters[i];
 
 	return (*environment)->NewString(environment, utfChars, len);
+}
+
+jstring* getStringPair(JNIEnv* environment, char* characters, int len)
+{
+	jchar* utfChars;
+	jstring ret[2];
+	int splitIndex;
+	int stringLength;
+
+	splitIndex = -1;
+
+	for(int i = 0; i < len; i++)
+	{
+		if(characters[i] == '=')
+		{
+			splitIndex = i;
+			break;
+		}
+	}
+
+	if(splitIndex == -1)
+	{
+		ret[0] = getNullTerminatedString(environment, characters);
+		ret[1] = NULL;
+		return ret;
+	}
+
+	// get key name
+	utfChars = (jchar*)calloc(sizeof(jchar), splitIndex);
+
+	for(int i = 0; i < splitIndex; i++)
+		utfChars[i] = (jchar)characters[i];
+	ret[0] = (*environment)->NewString(environment, utfChars, splitIndex);
+
+	// get key value
+	stringLength = len - splitIndex - 1;
+	utfChars = (jchar*)calloc(sizeof(jchar), stringLength);
+
+	for(int i = 0; i < stringLength; i++)
+		utfChars[i] = (jchar)characters[i + splitIndex + 1];
+	ret[1] = (*environment)->NewString(environment, utfChars, stringLength);
+	return ret;
 }
 
 /*

@@ -12,7 +12,8 @@ typedef struct
 } OpusWrapper;
 
 void loadOpusComments(JNIEnv*, OggOpusFile*, jobject);
-jstring getJString(JNIEnv*, char*, int);
+jstring getNullTerminatedString(JNIEnv*, char*);
+jstring* getStringPair(JNIEnv*, char*, int);
 
 void throwException(JNIEnv*, const char*);
 void throwOpusException(JNIEnv*, int, const char*);
