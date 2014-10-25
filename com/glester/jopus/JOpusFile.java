@@ -25,6 +25,8 @@ public class JOpusFile extends JOpusDecodable
 
 	public JOpusFile(String filePath, boolean createSampleBuffer)
 	{
+		super();
+		
 		jopusOpenFile(filePath);
 		determineSampleSize();
 

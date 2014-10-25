@@ -151,7 +151,8 @@ gcc -shared ./com/glester/jopus/*.c \
 	-L./opus/.libs -L./opusfile/.libs \
 	-lopus -lopusfile \
 	-o ./libjopus.so \
-	-w -fPIC -m64
+	-w -fPIC -m64 \
+	-std=c99
 checkError
 
 cp ./ogg/src/.libs/libogg.so ./libogg.so.0

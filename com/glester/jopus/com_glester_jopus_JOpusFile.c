@@ -32,6 +32,7 @@ JNIEXPORT void JNICALL Java_com_glester_jopus_JOpusFile_jopusOpenFile(JNIEnv* en
 		return;
 	}
 
+	loadOpusComments(environment, opus->file, caller);
 	head = op_head(opus->file, NULL);
 
 	sampleRate = head->input_sample_rate;

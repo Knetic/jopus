@@ -31,6 +31,7 @@ public class JOpusBufferFile extends JOpusDecodable
 
 	public JOpusBufferFile(ByteBuffer encodedBuffer, boolean createSampleBuffer)
 	{
+		super();
 		this.encodedBuffer = encodedBuffer;
 		jopusOpenMemory(encodedBuffer);
 

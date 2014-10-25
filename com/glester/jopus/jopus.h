@@ -11,5 +11,8 @@ typedef struct
 	OggOpusFile* file;
 } OpusWrapper;
 
+void loadOpusComments(JNIEnv*, OggOpusFile*, jobject);
+jstring getJString(JNIEnv*, char*, int);
+
 void throwException(JNIEnv*, const char*);
 void throwOpusException(JNIEnv*, int, const char*);

@@ -1,6 +1,8 @@
 package com.glester.jopus;
 
 import java.nio.*;
+import java.util.Arrays;
+
 import javax.sound.sampled.*;
 
 public abstract class JOpusDecodable
@@ -15,12 +17,15 @@ public abstract class JOpusDecodable
 	protected long wrapperPointer;
 	protected int sampleSizeInBytes;
 
+	private String[] comments;
+	private String vendor;
+	
 	public abstract int read();
 	public abstract void close();
 
 	protected native int jopusRead(ByteBuffer samplesBuffer);
 	protected native void jopusClose();
-
+	
 	public void setSampleBuffer(ByteBuffer buffer)
 	{
 		if(buffer == null)
@@ -45,6 +50,16 @@ public abstract class JOpusDecodable
 	public ByteBuffer getSampleBuffer()
 	{
 		return sampleBuffer;
+	}
+	
+	public Iterable<String> getComments()
+	{
+		return Arrays.asList(comments);
+	}
+	
+	public String getVendor()
+	{
+		return vendor;
 	}
 
 	protected void createSampleBuffer()

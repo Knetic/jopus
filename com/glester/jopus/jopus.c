@@ -1,6 +1,62 @@
 #include "jopus.h"
 
 /*
+	Loads the "tags" for an OpusFile.
+*/
+void loadOpusComments(JNIEnv* environment, OggOpusFile* file, jobject caller)
+{
+	jclass callerClass;
+	jclass stringClass;
+	jfieldID commentsArrayID;
+	jfieldID vendorID;
+	OpusTags* tags;
+	jobjectArray commentsArray;
+	jstring vendorString;
+	jstring commentString;
+
+	stringClass		= (*environment)->FindClass(environment, "java/lang/String");
+	callerClass 		= (*environment)->GetObjectClass(environment, caller);
+	commentsArrayID 	= (*environment)->GetFieldID(environment, callerClass, "comments", "[Ljava/lang/String;");
+	vendorID 		= (*environment)->GetFieldID(environment, callerClass, "vendor", "Ljava/lang/String;");
+
+	tags = op_tags(file, -1);
+	commentsArray = (*environment)->NewObjectArray(environment, tags->comments, stringClass, (*environment)->NewStringUTF(environment, ""));
+
+	for(int i = 0; i < tags->comments; i++)
+	{
+		commentString = getJString(environment, tags->user_comments[i], tags->comment_lengths[i]);
+		(*environment)->SetObjectArrayElement(environment, commentsArray, i, commentString);
+	}
+
+	vendorString = getJString(environment, tags->vendor, -1);
+
+	(*environment)->SetObjectField(environment, caller, commentsArrayID, commentsArray);
+	(*environment)->SetObjectField(environment, caller, vendorID, vendorString);
+}
+
+jstring getJString(JNIEnv* environment, char* characters, int len)
+{
+	jchar* utfChars;
+
+	// if length is -1, assume string is null-terminated.
+	if(len == -1)
+	{
+		do
+		{
+			len++;
+		}
+		while(characters[len] != 0);
+	}
+
+	utfChars = (jchar*)calloc(sizeof(jchar), len);
+
+	for(int i = 0; i < len; i++)
+		utfChars[i] = (jchar)characters[i];
+
+	return (*environment)->NewString(environment, utfChars, len);
+}
+
+/*
 	Throws a generic Exception, whose message will be the given [errorMessage].
 */
 void throwException(JNIEnv* environment, const char* errorMessage)
