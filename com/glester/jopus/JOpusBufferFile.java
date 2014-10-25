@@ -71,14 +71,20 @@ public class JOpusBufferFile extends JOpusDecodable
 	{
 		ByteBuffer encodedBuffer;
 		byte[] copyBuffer;
-		int bytesRead;
+		int bytesRead, totalBytesRead;
 
+		totalBytesRead = 0;
 		encodedBuffer = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
 		copyBuffer = new byte[1024];
 
 		while((bytesRead = (int)stream.read(copyBuffer)) > 0)
+		{
 			encodedBuffer.put(copyBuffer, 0, bytesRead);
-		
+			totalBytesRead += bytesRead;	
+		}
+
+		if(totalBytesRead != size)
+			throw new IOException("Expected to read " + size + " bytes, but steam was exhausted after " + totalBytesRead);
 		return encodedBuffer;	
 	}
 
