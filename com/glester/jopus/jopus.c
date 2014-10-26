@@ -9,6 +9,10 @@ void loadOpusMeta(JNIEnv* environment, OpusWrapper* opus, jobject caller)
 	jmethodID endiannessMethod;
 	jfieldID metaPointerID;
 	jfieldID formatID;
+	jfieldID uncompressedLengthID;
+	jfieldID bitrateID;
+	jfieldID versionID;
+	jfieldID streamCountID;
 	jobject format;
 	opus_uint32 sampleRate;
 	opus_int32 channels;
@@ -31,12 +35,19 @@ void loadOpusMeta(JNIEnv* environment, OpusWrapper* opus, jobject caller)
 	format 			= (*environment)->NewObject(environment, formatClass, formatConstructor, (jfloat)(sampleRate / channels), 16, channels, JNI_TRUE, bigEndian);
 
 	// set fields in this object
-	
 	metaPointerID	= (*environment)->GetFieldID(environment, callerClass, "wrapperPointer", "J");
 	formatID	= (*environment)->GetFieldID(environment, callerClass, "format", "Ljavax/sound/sampled/AudioFormat;");
+	uncompressedLengthID	= (*environment)->GetFieldID(environment, callerClass, "uncompressedLength", "J");
+	bitrateID	= (*environment)->GetFieldID(environment, callerClass, "bitrate", "I");
+	versionID	= (*environment)->GetFieldID(environment, callerClass, "opusVersion", "I");
+	streamCountID	= (*environment)->GetFieldID(environment, callerClass, "streamCount", "I");
 
 	(*environment)->SetLongField(environment, caller, metaPointerID, (jlong)opus);
 	(*environment)->SetObjectField(environment, caller, formatID, format);
+	(*environment)->SetLongField(environment, caller, uncompressedLengthID, op_pcm_total(opus->file, -1));
+	(*environment)->SetIntField(environment, caller, bitrateID, op_bitrate(opus->file, -1));
+	(*environment)->SetIntField(environment, caller, versionID, head->version);
+	(*environment)->SetIntField(environment, caller, streamCountID, head->stream_count);
 }
 
 /*

@@ -31,6 +31,10 @@ public class OpusTest
 	public static void printComments()
 	{
 		System.out.println("Vendor: '"+opus.getVendor()+"'");
+		System.out.println("Version: " + opus.getVersion());
+		System.out.println("Streams: " + opus.getStreamCount());
+		System.out.println("Uncompressed length: " + opus.getUncompressedLength() + " bytes");
+		System.out.println("Bitrate: " + opus.getBitrate());
 
 		for(String comment : opus.getComments())
 			System.out.println(comment);

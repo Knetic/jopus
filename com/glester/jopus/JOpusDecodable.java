@@ -90,6 +90,26 @@ public abstract class JOpusDecodable
 		return vendor;
 	}
 
+	public long getUncompressedLength()
+	{
+		return uncompressedLength;
+	}
+
+	public int getBitrate()
+	{
+		return bitrate;
+	}
+
+	public int getVersion()
+	{
+		return opusVersion;
+	}
+
+	public int getStreamCount()
+	{
+		return streamCount;
+	}
+
 	protected void createSampleBuffer()
 	{
 		sampleBuffer = ByteBuffer.allocateDirect(getRequiredBufferSize() / 4).order(ByteOrder.nativeOrder());
