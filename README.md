@@ -40,6 +40,12 @@ Why doesn't this support feature XYZ?
 
 Right now, the library only plays files (not arbitrary streams, or http urls); and doesn't expose most of the file's metadata. These are goals of mine, and their status can be found on this repository's Issues page. Don't worry, I'd like those features too.
 
+Activity
+--
+
+If this repository hasn't been updated in a while, it's probably because I don't have any outstanding issues to work on - it's not because I've abandoned the project. If you have questions, issues, or patches; I'm completely open to pull requests, issues opened on github, or emails from out of the blue.
+
+
 Can I contribute?
 ==
 
