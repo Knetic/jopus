@@ -145,14 +145,23 @@ checkError
 # compile jopus native
 echo "Compiling jni library"
 
-gcc -shared ./com/glester/jopus/*.c \
+find ./com/glester/jopus/ -name "*.c" -exec \
+libtool --mode=compile gcc -c -O -g \
 	-I./ogg/include -I./opus/include -I./opusfile/include \
 	-I$JAVA_HOME/include -I$JAVA_HOME/include/linux \
-	-L./opus/.libs -L./opusfile/.libs \
+	-L./opus/.libs/*.lo -L./opusfile/.libs/*.lo \
 	-lopus -lopusfile \
+	-w -m64 \
+	-std=c99 \
+	{} \;
+
+gcc \
+	-g -O -w -fPIC -m64 -std=c99 -shared \
 	-o ./libjopus.so \
-	-w -fPIC -m64 \
-	-std=c99
+	$(find . -wholename "*.libs/*.o") \
+	-lm -lssl -lcrypto -lz;
+
+#$(find . -name "*.lo") \
 checkError
 
 cp ./ogg/src/.libs/libogg.so ./libogg.so.0

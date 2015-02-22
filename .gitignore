@@ -5,6 +5,8 @@ opusfile
 doc
 
 *.so*
+*.lo
+*.o
 *.class
 *.jar
 *.log
