@@ -1,6 +1,4 @@
 #!/bin/bash
 
-export LD_LIBRARY_PATH=.
-
 javac OpusTest.java
-java OpusTest
+java -Djava.library.path=./ OpusTest 

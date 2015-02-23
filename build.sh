@@ -161,12 +161,7 @@ gcc \
 	$(find . -wholename "*.libs/*.o") \
 	-lm -lssl -lcrypto -lz;
 
-#$(find . -name "*.lo") \
 checkError
-
-cp ./ogg/src/.libs/libogg.so ./libogg.so.0
-cp ./opus/.libs/libopus.so ./libopus.so.0
-cp ./opusfile/.libs/libopusfile.so ./libopusfile.so.0
 
 # make jar
 echo "Zipping"
